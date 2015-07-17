@@ -1,7 +1,7 @@
 package navarrus
 
 import scala.math.BigDecimal
-
+import BigDecimal.RoundingMode.HALF_EVEN
 
 /**
  * Represent money. Money has amount and currency.
@@ -10,10 +10,7 @@ import scala.math.BigDecimal
  * @param currency the money currency
  */
 class Money private[navarrus] (val amount:BigDecimal, val currency:Currency) {
-
-  private[this] val CurrencyMismatchError: String = "currency mismatch"
-
-  import BigDecimal.RoundingMode.HALF_EVEN
+  import Money._
 
   // amount scaled by currency scale and rounded by HALF_EVEN (bankers rounding)
   private val scaled =  amount.setScale(currency.scale, HALF_EVEN)
@@ -59,12 +56,14 @@ class Money private[navarrus] (val amount:BigDecimal, val currency:Currency) {
     case _ => false
   }
 
-  override def toString = s"${currency.symbol}${amount.toString()}"
+  override def toString = s"${currency.symbol} ${scaled}"
 }
 
 
 
 object Money {
+  private val CurrencyMismatchError: String = "currency mismatch"
+
   /**
    * Create a Money instance having the given amount and implicit currency.
    *
