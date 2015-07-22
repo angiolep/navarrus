@@ -12,24 +12,42 @@ class MoneySpec extends FlatSpec with ShouldMatchers {
     Money("100.00") should equal(Money("100.00"))
     Money("100.00") should not equal(Money("100.00")(JPY))
   }
+
   it should "round according to its currency" in {
     Money("100.994").round should equal (Money("100.99"))
     Money("100.994")(JPY).round should equal (Money("101")(JPY))
   }
-  it should "fail when adding different currency" in {
-    an [IllegalArgumentException ] should be thrownBy(Money("100.00") + Money("100.00")(JPY))
+
+  it should "throw exception when operating on different currencies" in {
+    Seq (
+      (m1: Money, m2: Money) => m1 + m2,
+      (m1: Money, m2: Money) => m1 - m2,
+      (m1: Money, m2: Money) => m1 + m2,
+      (m1: Money, m2: Money) => m1 + m2
+    )
+    .foreach (op =>
+      the [IllegalArgumentException] thrownBy (
+        op(Money("100.00"), Money("100.00")(JPY))
+      )
+      should have message (s"requirement failed: ${Money.CurrencyRequirement}")
+    )
   }
-  it should "fail when subtracting different currency" in {
-    an [IllegalArgumentException ] should be thrownBy(Money("100.00") - Money("100.00")(JPY))
-  }
-  it should "succeed when adding same currency" in {
+
+  it should "succeed when operating on same currencies" in {
     (Money("100.994") + Money("0.017")) should equal(Money("101.011"))
-  }
-  it should "succeed when subtracting same currency" in {
     (Money("100.994") - Money("0.017")) should equal(Money("100.977"))
+    (Money("100.994") * Money("0.017")) should equal(Money("1.716898"))
+    (Money("100.994") / Money("0.017")) should equal(Money("5940.82352941176"))
   }
-  /*TODO it should "succeed when multiplying a BigDecimal" in {
-    (Money("100.00") * BigDecimal("0.02")) should equal(Money("2.00"))
-    (BigDecimal("0.02") * Money("100.00")) should equal(Money("2.00"))
-  }*/
+
+  it should "succeed when operating on BigDecimal" in {
+    (Money("100.994") + BigDecimal("0.017")) should equal(Money("101.011"))
+    (BigDecimal("0.017") + Money("100.994")) should equal(Money("101.011"))
+    (Money("100.994") - BigDecimal("0.017")) should equal(Money("100.977"))
+    (BigDecimal("100.994") - Money("0.017")) should equal(Money("100.977"))
+    (Money("100.994") * BigDecimal("0.017")) should equal(Money("1.716898"))
+    (BigDecimal("100.994") * Money("0.017")) should equal(Money("1.716898"))
+    (Money("100.994") / BigDecimal("0.017")) should equal(Money("5940.82352941176"))
+    (BigDecimal("100.994") / Money("0.017")) should equal(Money("5940.82352941176"))
+  }
 }

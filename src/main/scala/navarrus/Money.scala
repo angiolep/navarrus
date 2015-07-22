@@ -3,6 +3,7 @@ package navarrus
 import scala.math.BigDecimal
 import BigDecimal.RoundingMode.HALF_EVEN
 
+
 /**
  * Represent money. Money has amount and currency.
  *
@@ -24,23 +25,22 @@ class Money private[navarrus] (val amount:BigDecimal, val currency:Currency) {
 
 
   def +(that: Money) = {
-    require(that.currency == this.currency, CurrencyMismatchError)
+    require(that.currency == this.currency, CurrencyRequirement)
     new Money(this.amount + that.amount, this.currency)
   }
 
-
   def -(that: Money) = {
-    require(that.currency == this.currency, CurrencyMismatchError)
+    require(that.currency == this.currency, CurrencyRequirement)
     new Money(this.amount - that.amount, this.currency)
   }
 
   def *(that: Money) =  {
-    require(that.currency == this.currency, CurrencyMismatchError)
+    require(that.currency == this.currency, CurrencyRequirement)
     new Money(this.amount * that.amount, this.currency)
   }
 
   def /(that: Money) =  {
-    require(that.currency == this.currency, CurrencyMismatchError)
+    require(that.currency == this.currency, CurrencyRequirement)
     new Money(this.amount / that.amount, this.currency)
   }
 
@@ -62,7 +62,7 @@ class Money private[navarrus] (val amount:BigDecimal, val currency:Currency) {
 
 
 object Money {
-  private val CurrencyMismatchError: String = "currency mismatch"
+  private[navarrus] val CurrencyRequirement: String = "currency must match"
 
   /**
    * Create a Money instance having the given amount and implicit currency.
@@ -73,3 +73,5 @@ object Money {
    */
   def apply(amount:String)(implicit currency:Currency) = new Money(BigDecimal(amount), currency)
 }
+
+
