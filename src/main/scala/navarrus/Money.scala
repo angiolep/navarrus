@@ -14,14 +14,14 @@ class Money private[navarrus] (val amount:BigDecimal, val currency:Currency) {
   import Money._
 
   // amount scaled by currency scale and rounded by HALF_EVEN (bankers rounding)
-  private val scaled =  amount.setScale(currency.scale, HALF_EVEN)
+  private val scaledAmount =  amount.setScale(currency.scale, HALF_EVEN)
 
   /**
    * Round this amount according to its currency (e.g "100.1287" becomes "100.13" when currency is "GBP")
    *
    * @return a new Money instance scaled by its currency scale
    */
-  def round = new Money(scaled, this.currency)
+  def round = new Money(scaledAmount, this.currency)
 
 
   def +(that: Money) = {
@@ -52,11 +52,11 @@ class Money private[navarrus] (val amount:BigDecimal, val currency:Currency) {
    * @return true if monies have same currencies and scaled amount
    */
   override def equals(other:Any) : Boolean = other match {
-    case that:Money => this.currency == that.currency && this.scaled == that.scaled
+    case that:Money => this.currency == that.currency && this.scaledAmount == that.scaledAmount
     case _ => false
   }
 
-  override def toString = s"${currency.symbol} ${scaled}"
+  override def toString = s"${currency.symbol} ${scaledAmount}"
 }
 
 

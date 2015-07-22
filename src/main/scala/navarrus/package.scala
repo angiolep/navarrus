@@ -9,7 +9,7 @@ package object navarrus {
    * @param currency the implicit currency
    * @return a Money instance
    */
-  implicit def fromBigDecimal(amount: BigDecimal)(implicit currency:Currency) =
+  implicit def bigDecimal2Money(amount: BigDecimal)(implicit currency:Currency) =
     new Money(amount, currency)
 
 
